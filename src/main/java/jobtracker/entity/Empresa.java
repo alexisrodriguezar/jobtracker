@@ -8,12 +8,12 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table (name = "empresa")
+@Table(name = "empresa")
 public class Empresa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "empresa_id")
+    @Column(name = "empresa_id")
     private Long id;
 
     @Column(name = "nombre", nullable = false, unique = true)
