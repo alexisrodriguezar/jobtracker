@@ -1,6 +1,8 @@
 package jobtracker.controller;
 
 import jakarta.validation.Valid;
+import jobtracker.dto.LoginRequest;
+import jobtracker.dto.LoginResponse;
 import jobtracker.dto.RegisterRequest;
 import jobtracker.dto.UsuarioResponse;
 import jobtracker.service.AuthService;
@@ -23,5 +25,11 @@ public class AuthController {
     public ResponseEntity<UsuarioResponse> register(@Valid @RequestBody RegisterRequest request) {
         UsuarioResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
