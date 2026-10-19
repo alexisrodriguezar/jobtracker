@@ -1,5 +1,7 @@
 package jobtracker.service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,5 +32,26 @@ public class JwtService {
                 .expiration(new Date(ahora.getTime() + expirationMs))
                 .signWith(getKey())
                 .compact();
+    }
+
+    private Claims extraerClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public String extraerEmail(String token) {
+        return extraerClaims(token).getSubject();
+    }
+
+    public boolean esTokenValido(String token) {
+        try {
+            extraerClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException ex) {
+            return false;
+        }
     }
 }
