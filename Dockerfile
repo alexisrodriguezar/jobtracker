@@ -1,4 +1,3 @@
-# ===== Etapa 1: compilar el proyecto =====
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
