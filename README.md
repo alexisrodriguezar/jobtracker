@@ -21,14 +21,14 @@ Es un proyecto personal para practicar un backend completo con Java y Spring Boo
 
 ## Tecnologías
 
-| Área | Herramientas                                |
-|---|---------------------------------------------|
-| Lenguaje y framework | Java 21, Spring Boot 4, Maven               |
-| Persistencia | Spring Data JPA (Hibernate), MySQL 8.4      |
-| Seguridad | Spring Security, JWT (jjwt), BCrypt         |
-| Documentación | springdoc-openapi (Swagger UI)              |
-| Testing | JUnit 5, Mockito, Testcontainers            |
-| Infraestructura | Docker, Docker Compose, GitHub Actions (CI) |
+| Área | Herramientas                                   |
+|---|------------------------------------------------|
+| Lenguaje y framework | Java 21, Spring Boot 4, Maven                  |
+| Persistencia | Spring Data JPA (Hibernate), MySQL 8.4, Flyway |
+| Seguridad | Spring Security, JWT (jjwt), BCrypt            |
+| Documentación | springdoc-openapi (Swagger UI)                 |
+| Testing | JUnit 5, Mockito, Testcontainers               |
+| Infraestructura | Docker, Docker Compose, GitHub Actions (CI)    |
 
 ## Arquitectura
 
@@ -164,10 +164,11 @@ Los tests de integración necesitan Docker en ejecución. Todo el conjunto corre
 - **Mismo mensaje de error** para email inexistente y contraseña incorrecta, para no permitir descubrir qué correos están registrados.
 - **Contraseñas con BCrypt**: nunca se guardan ni se devuelven en texto plano.
 - **DTOs separados** para entrada y salida, para no exponer las entidades.
+- **Esquema versionado con Flyway**: cada cambio de la base es un archivo SQL numerado y revisable en un Pull Request; Hibernate solo valida que las entidades coincidan con el esquema.
 
 ## Próximos pasos
 
-- [ ] Migraciones de base de datos con Flyway.
+- [x] Migraciones de base de datos con Flyway.
 - [ ] Análisis de ofertas con IA: comparar una oferta con el perfil del usuario.
 - [ ] Deploy con URL pública.
 - [ ] Frontend con React.
