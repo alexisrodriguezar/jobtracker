@@ -1,0 +1,1 @@
+CREATE INDEX idx_postulaciones_usuario_fecha ON postulaciones (usuario_id, fecha_postulacion);
