@@ -112,7 +112,8 @@ Ejemplo, crear una postulación (`POST /postulaciones`):
   "puesto": "Backend Developer Jr",
   "link": "https://ejemplo.com/oferta",
   "nota": "Entrevista técnica pendiente",
-  "seniority": "JUNIOR"
+  "seniority": "JUNIOR",
+  "descripcionOferta": "Buscamos desarrollador backend con Java, Spring Boot y MySQL."
 }
 ```
 
@@ -127,21 +128,22 @@ Respuesta (`201 Created`):
   "seniority": "JUNIOR",
   "link": "https://ejemplo.com/oferta",
   "nota": "Entrevista técnica pendiente",
-  "fechaPostulacion": "2026-10-27"
+  "fechaPostulacion": "2026-10-27",
+  "descripcionOferta": "Buscamos desarrollador backend con Java, Spring Boot y MySQL."
 }
 ```
 
 ## Endpoints
 
 | Método | Ruta | Descripción | Auth |
-|---|---|---|---|
-| POST | `/auth/register` | Registrar un usuario | No |
-| POST | `/auth/login` | Iniciar sesión y obtener el token | No |
-| POST | `/postulaciones` | Crear una postulación (estado inicial `ENVIADA`) | Sí |
-| GET | `/postulaciones` | Listar las propias, con filtros y paginación | Sí |
-| GET | `/postulaciones/{id}` | Obtener una postulación | Sí |
-| PUT | `/postulaciones/{id}` | Actualizar los datos de una postulación | Sí |
-| PATCH | `/postulaciones/{id}/estado` | Cambiar el estado | Sí |
+|--------|---|---|---|
+| POST   | `/auth/register` | Registrar un usuario | No |
+| POST   | `/auth/login` | Iniciar sesión y obtener el token | No |
+| POST   | `/postulaciones` | Crear una postulación (estado inicial `ENVIADA`) | Sí |
+| GET    | `/postulaciones` | Listar las propias, con filtros y paginación | Sí |
+| GET    | `/postulaciones/{id}` | Obtener una postulación | Sí |
+| PATCH    | `/postulaciones/{id}` | Modificar parcialmente una postulación | Sí |
+| PATCH  | `/postulaciones/{id}/estado` | Cambiar el estado | Sí |
 | DELETE | `/postulaciones/{id}` | Eliminar una postulación | Sí |
 
 Parámetros opcionales del listado: `estado`, `buscar`, `page`, `size` y `sort`.
@@ -166,6 +168,7 @@ Los tests de integración necesitan Docker en ejecución. Todo el conjunto corre
 - **Contraseñas con BCrypt**: nunca se guardan ni se devuelven en texto plano.
 - **DTOs separados** para entrada y salida, para no exponer las entidades.
 - **Esquema versionado con Flyway**: cada cambio de la base es un archivo SQL numerado y revisable en un Pull Request; Hibernate solo valida que las entidades coincidan con el esquema.
+- **`PATCH` para modificar postulaciones**: solo se actualizan los campos que se envían, y un texto opcional se borra enviándolo vacío. El estado tiene su propio endpoint (`PATCH /postulaciones/{id}/estado`).
 
 ## Próximos pasos
 
