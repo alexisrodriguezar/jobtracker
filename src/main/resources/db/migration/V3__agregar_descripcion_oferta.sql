@@ -1,0 +1,1 @@
+   ALTER TABLE postulaciones ADD COLUMN descripcion_oferta VARCHAR(8000);
