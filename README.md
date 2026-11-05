@@ -165,6 +165,7 @@ Los tests de integración necesitan Docker en ejecución. Todo el conjunto corre
 - **Contraseñas con BCrypt**: nunca se guardan ni se devuelven en texto plano.
 - **DTOs separados** para entrada y salida, para no exponer las entidades.
 - **Esquema versionado con Flyway**: cada cambio de la base es un archivo SQL numerado y revisable en un Pull Request; Hibernate solo valida que las entidades coincidan con el esquema.
+- **`PUT` reemplaza los datos de la postulación**: los campos que no se envían quedan vacíos. Para cambiar solo el estado se usa el endpoint `PATCH`.
 
 ## Próximos pasos
 
