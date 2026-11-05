@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jobtracker.dto.ErrorResponse;
-import jobtracker.dto.EstadoRequest;
-import jobtracker.dto.PostulacionRequest;
-import jobtracker.dto.PostulacionResponse;
+import jobtracker.dto.*;
 import jobtracker.entity.Estado;
 import jobtracker.service.PostulacionService;
 import lombok.RequiredArgsConstructor;
@@ -81,19 +78,20 @@ public class PostulacionController {
         return ResponseEntity.ok(postulacionService.obtener(auth.getName(), id));
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Actualizar una postulación",
-            description = "Modifica los datos de la postulación (empresa, puesto, link, nota, seniority, fecha y "
-                    + "descripción de la oferta). El estado se cambia con el endpoint específico.")
+    @PatchMapping("/{id}")
+    @Operation(summary = "Modificar una postulación",
+            description = "Modifica solo los campos que se envían; los demás conservan su valor. "
+                    + "Para borrar un texto opcional (link, nota o descripción de la oferta) hay que enviarlo vacío. "
+                    + "El estado se cambia con el endpoint específico.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Postulación actualizada"),
+            @ApiResponse(responseCode = "200", description = "Postulación modificada"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),
             @ApiResponse(responseCode = "404", description = "No existe o no pertenece al usuario",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<PostulacionResponse> actualizar(Authentication auth, @PathVariable Long id,
-                                                          @Valid @RequestBody PostulacionRequest request) {
-        return ResponseEntity.ok(postulacionService.actualizar(auth.getName(), id, request));
+    public ResponseEntity<PostulacionResponse> modificar(Authentication auth, @PathVariable Long id,
+                                                         @Valid @RequestBody PostulacionPatchRequest request) {
+        return ResponseEntity.ok(postulacionService.modificar(auth.getName(), id, request));
     }
 
     @PatchMapping("/{id}/estado")
