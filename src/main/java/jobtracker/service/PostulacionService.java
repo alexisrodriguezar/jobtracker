@@ -1,5 +1,6 @@
 package jobtracker.service;
 
+import jobtracker.dto.PostulacionPatchRequest;
 import jobtracker.dto.PostulacionRequest;
 import jobtracker.dto.PostulacionResponse;
 import jobtracker.entity.Empresa;
@@ -51,10 +52,31 @@ public class PostulacionService {
     }
 
     @Transactional
-    public PostulacionResponse actualizar(String email, Long id, PostulacionRequest request) {
+    public PostulacionResponse modificar(String email, Long id, PostulacionPatchRequest request) {
         Postulacion postulacion = buscarPropia(email, id);
-        postulacion.setEmpresa(obtenerOCrearEmpresa(request.empresa()));
-        aplicarDatos(postulacion, request);
+
+        if (request.empresa() != null) {
+            postulacion.setEmpresa(obtenerOCrearEmpresa(request.empresa()));
+        }
+        if (request.puesto() != null) {
+            postulacion.setPuesto(request.puesto().trim());
+        }
+        if (request.link() != null) {
+            postulacion.setLink(vacioANull(request.link()));
+        }
+        if (request.nota() != null) {
+            postulacion.setNota(vacioANull(request.nota()));
+        }
+        if (request.seniority() != null) {
+            postulacion.setSeniority(request.seniority());
+        }
+        if (request.descripcionOferta() != null) {
+            postulacion.setDescripcionOferta(vacioANull(request.descripcionOferta()));
+        }
+        if (request.fechaPostulacion() != null) {
+            postulacion.setFechaPostulacion(request.fechaPostulacion());
+        }
+
         return toResponse(postulacion);
     }
 
@@ -99,6 +121,10 @@ public class PostulacionService {
         } else if (p.getFechaPostulacion() == null) {
             p.setFechaPostulacion(LocalDate.now());
         }
+    }
+
+    private String vacioANull(String texto) {
+        return texto.isBlank() ? null : texto;
     }
 
     private PostulacionResponse toResponse(Postulacion p) {
