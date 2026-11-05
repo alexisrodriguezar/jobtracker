@@ -13,5 +13,6 @@ public record PostulacionResponse(
         Seniority seniority,
         String link,
         String nota,
-        LocalDate fechaPostulacion
+        LocalDate fechaPostulacion,
+        String descripcionOferta
 ) {}

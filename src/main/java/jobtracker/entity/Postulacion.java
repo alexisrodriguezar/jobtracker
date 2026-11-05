@@ -1,7 +1,11 @@
 package jobtracker.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -45,4 +49,7 @@ public class Postulacion {
 
     @Column(name = "fecha_postulacion")
     private LocalDate fechaPostulacion;
+
+    @Column(name = "descripcion_oferta", length = 8000)
+    private String descripcionOferta;
 }
