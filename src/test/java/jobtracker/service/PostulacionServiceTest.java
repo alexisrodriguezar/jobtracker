@@ -202,7 +202,7 @@ class PostulacionServiceTest {
         when(empresaRepository.save(any(Empresa.class))).thenAnswer(invocacion -> invocacion.getArgument(0));
 
         PostulacionRequest request = new PostulacionRequest(
-                "Mercado Libre", "Developer", "https://nuevo.com", "Nueva nota", Seniority.SEMI_SENIOR, null);
+                "Mercado Libre", "Developer", "https://nuevo.com", "Nueva nota", Seniority.SEMI_SENIOR, null, null);
         PostulacionResponse response = postulacionService.actualizar(EMAIL_ANA, 100L, request);
 
         assertEquals("Mercado Libre", response.empresa());
@@ -225,6 +225,48 @@ class PostulacionServiceTest {
 
         verify(empresaRepository, never()).findByNombreIgnoreCase(any());
         verify(empresaRepository, never()).save(any());
+    }
+
+    @Test
+    void actualizar_camposOmitidos_conservanSusValoresAnteriores() {
+        Usuario ana = ana();
+        Postulacion postulacion = postulacionDe(ana, ey());
+        postulacion.setDescripcionOferta("Descripción original");
+
+        when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana));
+        when(postulacionRepository.findByIdAndUsuarioId(100L, 1L)).thenReturn(Optional.of(postulacion));
+        when(empresaRepository.findByNombreIgnoreCase("EY")).thenReturn(Optional.of(ey()));
+
+        PostulacionRequest request = new PostulacionRequest("EY", "Backend Developer", null, null, null, null, null);
+
+        PostulacionResponse response = postulacionService.actualizar(EMAIL_ANA, 100L, request);
+
+        assertEquals("Backend Developer", response.puesto());
+        assertEquals("https://ejemplo.com/oferta", response.link());
+        assertEquals("Nota original", response.nota());
+        assertEquals(Seniority.JUNIOR, response.seniority());
+        assertEquals("Descripción original", response.descripcionOferta());
+        assertEquals(FECHA, response.fechaPostulacion());
+    }
+
+    @Test
+    void actualizar_textoVacio_borraElCampo() {
+        Usuario ana = ana();
+        Postulacion postulacion = postulacionDe(ana, ey());
+        postulacion.setDescripcionOferta("Descripción original");
+
+        when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana));
+        when(postulacionRepository.findByIdAndUsuarioId(100L, 1L)).thenReturn(Optional.of(postulacion));
+        when(empresaRepository.findByNombreIgnoreCase("EY")).thenReturn(Optional.of(ey()));
+
+        PostulacionRequest request = new PostulacionRequest("EY", "Backend Jr", "", "   ", null, null, "");
+
+        PostulacionResponse response = postulacionService.actualizar(EMAIL_ANA, 100L, request);
+
+        assertNull(response.link());
+        assertNull(response.nota());
+        assertNull(response.descripcionOferta());
+        assertEquals(Seniority.JUNIOR, response.seniority());
     }
 
     @Test
@@ -275,6 +317,46 @@ class PostulacionServiceTest {
         verify(postulacionRepository, never()).delete(any());
     }
 
+    @Test
+    void crear_conDescripcionDeLaOferta_laGuardaYLaDevuelve() {
+        // Arrange
+        when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana()));
+        when(empresaRepository.findByNombreIgnoreCase("EY")).thenReturn(Optional.of(ey()));
+        when(postulacionRepository.save(any(Postulacion.class))).thenAnswer(invocacion -> invocacion.getArgument(0));
+
+        PostulacionRequest request = new PostulacionRequest(
+                "EY", "Backend Jr", "https://ejemplo.com/oferta", "Una nota", Seniority.JUNIOR, FECHA,
+                "Buscamos desarrollador Java con Spring Boot y MySQL");
+
+        PostulacionResponse response = postulacionService.crear(EMAIL_ANA, request);
+
+        ArgumentCaptor<Postulacion> captor = ArgumentCaptor.forClass(Postulacion.class);
+        verify(postulacionRepository).save(captor.capture());
+        assertEquals("Buscamos desarrollador Java con Spring Boot y MySQL",
+                captor.getValue().getDescripcionOferta());
+
+        assertEquals("Buscamos desarrollador Java con Spring Boot y MySQL", response.descripcionOferta());
+    }
+
+    @Test
+    void actualizar_conNuevaDescripcion_reemplazaLaAnterior() {
+        Usuario ana = ana();
+        Postulacion postulacion = postulacionDe(ana, ey());
+        postulacion.setDescripcionOferta("Descripción vieja");
+
+        when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana));
+        when(postulacionRepository.findByIdAndUsuarioId(100L, 1L)).thenReturn(Optional.of(postulacion));
+        when(empresaRepository.findByNombreIgnoreCase("EY")).thenReturn(Optional.of(ey()));
+
+        PostulacionRequest request = new PostulacionRequest(
+                "EY", "Backend Jr", "https://ejemplo.com/oferta", "Una nota", Seniority.JUNIOR, FECHA,
+                "Descripción nueva");
+
+        PostulacionResponse response = postulacionService.actualizar(EMAIL_ANA, 100L, request);
+
+        assertEquals("Descripción nueva", response.descripcionOferta());
+    }
+
     private Usuario ana() {
         Usuario usuario = new Usuario();
         usuario.setId(1L);
@@ -318,6 +400,6 @@ class PostulacionServiceTest {
 
     private PostulacionRequest request(String empresa, LocalDate fecha) {
         return new PostulacionRequest(
-                empresa, "Backend Jr", "https://ejemplo.com/oferta", "Una nota", Seniority.JUNIOR, fecha);
+                empresa, "Backend Jr", "https://ejemplo.com/oferta", "Una nota", Seniority.JUNIOR, fecha, null);
     }
 }
