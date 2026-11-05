@@ -1,5 +1,6 @@
 package jobtracker.service;
 
+import jobtracker.dto.PostulacionPatchRequest;
 import jobtracker.dto.PostulacionRequest;
 import jobtracker.dto.PostulacionResponse;
 import jobtracker.entity.*;
@@ -211,7 +212,7 @@ class PostulacionServiceTest {
     }
 
     @Test
-    void actualizar_postulacionPropia_cambiaLosDatosYConservaEstadoYFecha() {
+    void modificar_conTodosLosCampos_cambiaLosDatosYConservaEstadoYFecha() {
         Usuario ana = ana();
         Postulacion postulacion = postulacionDe(ana, ey());
         postulacion.setEstado(Estado.ENTREVISTA);
@@ -221,9 +222,10 @@ class PostulacionServiceTest {
         when(empresaRepository.findByNombreIgnoreCase("Mercado Libre")).thenReturn(Optional.empty());
         when(empresaRepository.save(any(Empresa.class))).thenAnswer(invocacion -> invocacion.getArgument(0));
 
-        PostulacionRequest request = new PostulacionRequest(
+        PostulacionPatchRequest request = new PostulacionPatchRequest(
                 "Mercado Libre", "Developer", "https://nuevo.com", "Nueva nota", Seniority.SEMI_SENIOR, null, null);
-        PostulacionResponse response = postulacionService.actualizar(EMAIL_ANA, 100L, request);
+
+        PostulacionResponse response = postulacionService.modificar(EMAIL_ANA, 100L, request);
 
         assertEquals("Mercado Libre", response.empresa());
         assertEquals("Developer", response.puesto());
@@ -236,31 +238,91 @@ class PostulacionServiceTest {
     }
 
     @Test
-    void actualizar_conNuevaDescripcion_reemplazaLaAnterior() {
+    void modificar_soloElPuesto_conservaTodoLoDemas() {
+        Usuario ana = ana();
+        Postulacion postulacion = postulacionDe(ana, ey());
+        postulacion.setDescripcionOferta("Descripción original");
+
+        when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana));
+        when(postulacionRepository.findByIdAndUsuarioId(100L, 1L)).thenReturn(Optional.of(postulacion));
+
+        PostulacionPatchRequest request = new PostulacionPatchRequest(
+                null, "Backend Developer", null, null, null, null, null);
+
+        PostulacionResponse response = postulacionService.modificar(EMAIL_ANA, 100L, request);
+
+        assertEquals("Backend Developer", response.puesto());
+        assertEquals("EY", response.empresa());
+        assertEquals("https://ejemplo.com/oferta", response.link());
+        assertEquals("Nota original", response.nota());
+        assertEquals(Seniority.JUNIOR, response.seniority());
+        assertEquals("Descripción original", response.descripcionOferta());
+        assertEquals(FECHA, response.fechaPostulacion());
+    }
+
+    @Test
+    void modificar_sinEmpresa_noConsultaNiCreaEmpresas() {
+        Usuario ana = ana();
+        when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana));
+        when(postulacionRepository.findByIdAndUsuarioId(100L, 1L))
+                .thenReturn(Optional.of(postulacionDe(ana, ey())));
+
+        postulacionService.modificar(EMAIL_ANA, 100L,
+                new PostulacionPatchRequest(null, "Nuevo puesto", null, null, null, null, null));
+
+        verify(empresaRepository, never()).findByNombreIgnoreCase(any());
+        verify(empresaRepository, never()).save(any());
+    }
+
+    @Test
+    void modificar_conNuevaDescripcion_reemplazaLaAnterior() {
         Usuario ana = ana();
         Postulacion postulacion = postulacionDe(ana, ey());
         postulacion.setDescripcionOferta("Descripción vieja");
 
         when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana));
         when(postulacionRepository.findByIdAndUsuarioId(100L, 1L)).thenReturn(Optional.of(postulacion));
-        when(empresaRepository.findByNombreIgnoreCase("EY")).thenReturn(Optional.of(ey()));
 
-        PostulacionRequest request = new PostulacionRequest(
-                "EY", "Backend Jr", "https://ejemplo.com/oferta", "Una nota", Seniority.JUNIOR, FECHA,
-                "Descripción nueva");
+        PostulacionPatchRequest request = new PostulacionPatchRequest(
+                null, null, null, null, null, null, "Descripción nueva");
 
-        PostulacionResponse response = postulacionService.actualizar(EMAIL_ANA, 100L, request);
+        PostulacionResponse response = postulacionService.modificar(EMAIL_ANA, 100L, request);
 
         assertEquals("Descripción nueva", response.descripcionOferta());
+        assertEquals("Backend Jr", response.puesto());
     }
 
     @Test
-    void actualizar_postulacionDeOtroUsuario_lanzaRecursoNoEncontradoYNoTocaEmpresas() {
+    void modificar_textoVacio_borraElCampo() {
+        Usuario ana = ana();
+        Postulacion postulacion = postulacionDe(ana, ey());
+        postulacion.setDescripcionOferta("Descripción original");
+
+        when(usuarioRepository.findByEmail(EMAIL_ANA)).thenReturn(Optional.of(ana));
+        when(postulacionRepository.findByIdAndUsuarioId(100L, 1L)).thenReturn(Optional.of(postulacion));
+
+        PostulacionPatchRequest request = new PostulacionPatchRequest(
+                null, null, "", "   ", null, null, "");
+
+        PostulacionResponse response = postulacionService.modificar(EMAIL_ANA, 100L, request);
+
+        assertNull(response.link());
+        assertNull(response.nota());
+        assertNull(response.descripcionOferta());
+        assertEquals("Backend Jr", response.puesto());
+        assertEquals(Seniority.JUNIOR, response.seniority());
+    }
+
+    @Test
+    void modificar_postulacionDeOtroUsuario_lanzaRecursoNoEncontradoYNoTocaEmpresas() {
         when(usuarioRepository.findByEmail(EMAIL_BETO)).thenReturn(Optional.of(beto()));
         when(postulacionRepository.findByIdAndUsuarioId(100L, 2L)).thenReturn(Optional.empty());
 
+        PostulacionPatchRequest request = new PostulacionPatchRequest(
+                "Mercado Libre", null, null, null, null, null, null);
+
         assertThrows(RecursoNoEncontradoException.class,
-                () -> postulacionService.actualizar(EMAIL_BETO, 100L, request("Mercado Libre", null)));
+                () -> postulacionService.modificar(EMAIL_BETO, 100L, request));
 
         verify(empresaRepository, never()).findByNombreIgnoreCase(any());
         verify(empresaRepository, never()).save(any());
