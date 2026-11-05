@@ -93,6 +93,7 @@ public class PostulacionService {
         p.setLink(r.link());
         p.setNota(r.nota());
         p.setSeniority(r.seniority());
+        p.setDescripcionOferta(r.descripcionOferta());
         if (r.fechaPostulacion() != null) {
             p.setFechaPostulacion(r.fechaPostulacion());
         } else if (p.getFechaPostulacion() == null) {
@@ -102,6 +103,6 @@ public class PostulacionService {
 
     private PostulacionResponse toResponse(Postulacion p) {
         return new PostulacionResponse(p.getId(), p.getEmpresa().getNombre(), p.getPuesto(),
-                p.getEstado(), p.getSeniority(), p.getLink(), p.getNota(), p.getFechaPostulacion());
+                p.getEstado(), p.getSeniority(), p.getLink(), p.getNota(), p.getFechaPostulacion(), p.getDescripcionOferta());
     }
 }

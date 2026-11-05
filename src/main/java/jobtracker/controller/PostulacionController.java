@@ -83,8 +83,8 @@ public class PostulacionController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar una postulación",
-            description = "Modifica los datos de la postulación (empresa, puesto, link, nota, seniority y fecha). "
-                    + "El estado se cambia con el endpoint específico.")
+            description = "Modifica los datos de la postulación (empresa, puesto, link, nota, seniority, fecha y "
+                    + "descripción de la oferta). El estado se cambia con el endpoint específico.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Postulación actualizada"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),

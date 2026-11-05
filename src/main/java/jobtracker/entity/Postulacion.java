@@ -45,4 +45,7 @@ public class Postulacion {
 
     @Column(name = "fecha_postulacion")
     private LocalDate fechaPostulacion;
+
+    @Column(name = "descripcion_oferta", length = 8000)
+    private String descripcionOferta;
 }
