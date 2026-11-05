@@ -18,6 +18,7 @@ Es un proyecto personal para practicar un backend completo con Java y Spring Boo
 - Empresas compartidas entre usuarios: si la empresa no existe, se crea automáticamente (sin distinguir mayúsculas).
 - Manejo global de errores con respuestas claras (`400`, `401`, `404`, `409`).
 - Documentación interactiva con **Swagger / OpenAPI**.
+- Cada postulación puede guardar el texto de la oferta laboral (descripción), que se usará para el análisis con IA.
 
 ## Tecnologías
 
