@@ -27,4 +27,9 @@ public class Usuario {
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
+
+    public static final int MAX_LARGO_PERFIL = 3000;
+
+    @Column(name = "perfil", length = MAX_LARGO_PERFIL)
+    private String perfil;
 }
