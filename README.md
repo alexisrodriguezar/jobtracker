@@ -19,6 +19,7 @@ Es un proyecto personal para practicar un backend completo con Java y Spring Boo
 - Manejo global de errores con respuestas claras (`400`, `401`, `404`, `409`).
 - Documentación interactiva con **Swagger / OpenAPI**.
 - Cada postulación puede guardar el texto de la oferta laboral (descripción), que se usará para el análisis con IA.
+- Perfil de habilidades del usuario (texto libre de hasta 3000 caracteres), que se usará para comparar con las ofertas.
 
 ## Tecnologías
 
@@ -145,7 +146,8 @@ Respuesta (`201 Created`):
 | PATCH    | `/postulaciones/{id}` | Modificar parcialmente una postulación | Sí |
 | PATCH  | `/postulaciones/{id}/estado` | Cambiar el estado | Sí |
 | DELETE | `/postulaciones/{id}` | Eliminar una postulación | Sí |
-
+| GET | `/perfil` | Obtener mi perfil de habilidades | Sí |
+| PUT | `/perfil` | Guardar mi perfil (reemplaza el anterior) | Sí |
 Parámetros opcionales del listado: `estado`, `buscar`, `page`, `size` y `sort`.
 Ejemplo: `GET /postulaciones?estado=ENTREVISTA&buscar=backend&page=0&size=10`
 
@@ -160,6 +162,10 @@ Ejemplo: `GET /postulaciones?estado=ENTREVISTA&buscar=backend&page=0&size=10`
 
 Los tests de integración necesitan Docker en ejecución. Todo el conjunto corre automáticamente en cada Pull Request mediante GitHub Actions.
 
+## Privacidad
+
+El perfil y el texto de las ofertas se enviarán a un proveedor externo de IA para generar el análisis. **No incluyas datos personales** (nombre, email, teléfono, dirección) en esos textos. En el nivel gratuito de algunos proveedores, el contenido enviado puede ser revisado y usado para mejorar sus productos.
+
 ## Decisiones de diseño
 
 - **JWT sin sesiones**: el servidor no guarda estado; el usuario se obtiene del token en cada request, nunca de un dato enviado por el cliente.
@@ -169,6 +175,7 @@ Los tests de integración necesitan Docker en ejecución. Todo el conjunto corre
 - **DTOs separados** para entrada y salida, para no exponer las entidades.
 - **Esquema versionado con Flyway**: cada cambio de la base es un archivo SQL numerado y revisable en un Pull Request; Hibernate solo valida que las entidades coincidan con el esquema.
 - **`PATCH` para modificar postulaciones**: solo se actualizan los campos que se envían, y un texto opcional se borra enviándolo vacío. El estado tiene su propio endpoint (`PATCH /postulaciones/{id}/estado`).
+- **Perfil como texto libre** guardado en la tabla `usuario` (hasta 3000 caracteres): es lo más simple que sirve para el análisis, y el usuario se identifica por el token en `/perfil`.
 
 ## Próximos pasos
 

@@ -1,0 +1,1 @@
+ALTER TABLE usuario ADD COLUMN perfil VARCHAR(3000);
