@@ -31,6 +31,7 @@ Es un proyecto personal para practicar un backend completo con Java y Spring Boo
 | Documentación | springdoc-openapi (Swagger UI)                 |
 | Testing | JUnit 5, Mockito, Testcontainers               |
 | Infraestructura | Docker, Docker Compose, GitHub Actions (CI)    |
+| IA | API de Gemini (Google AI Studio) |
 
 ## Arquitectura
 
@@ -59,6 +60,29 @@ src/main/java/jobtracker
 
 ## Cómo ejecutarlo
 
+### Variables de entorno
+
+La aplicación se configura con estas variables:
+
+| Variable | Para qué sirve | ¿Obligatoria? |
+|---|---|---|
+| `DB_USER` | Usuario de la base de datos | Sí |
+| `DB_PASSWORD` | Contraseña de ese usuario | Sí |
+| `DB_ROOT_PASSWORD` | Contraseña del administrador de MySQL (solo con Docker) | Solo con Docker |
+| `JWT_SECRET` | Clave para firmar los tokens (mínimo 32 caracteres) | Sí |
+| `GEMINI_API_KEY` | Clave de la API de Gemini, para el análisis con IA | Sí |
+| `GEMINI_MODEL` | Modelo de Gemini a utilizar | No (tiene un valor por defecto) |
+
+Con Docker se completan en el archivo `.env` (hay una plantilla en `.env.example`). Nunca subas tu `.env` al repositorio.
+
+#### Cómo obtener la clave de Gemini
+
+1. Entrá a [Google AI Studio](https://aistudio.google.com) con tu cuenta de Google.
+2. En el menú lateral, elegí **Get API key** y después **Create API key**.
+3. Copiala en tu `.env` como `GEMINI_API_KEY=...`.
+
+Tiene un nivel gratuito, con límites de uso. Ver la sección [Privacidad](#privacidad) antes de cargar datos.
+
 ### Con Docker (recomendado)
 
 Requisitos: [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y en ejecución.
@@ -70,7 +94,7 @@ cd jobtracker
 
 # 2. Crear el archivo de variables de entorno
 cp .env.example .env
-# Abrí el archivo .env y completá tus propias contraseñas y el JWT_SECRET
+# Abrí el archivo .env y completalo con tus valores (ver "Variables de entorno")
 
 # 3. Levantar la aplicación y la base de datos
 docker compose up --build
@@ -88,7 +112,7 @@ Para apagar todo: `docker compose down` (conserva los datos) o `docker compose d
 
 Requisitos: Java 21 y un MySQL local.
 
-1. Definí las variables de entorno `DB_USER`, `DB_PASSWORD` y `JWT_SECRET` (mínimo 32 caracteres).
+1. Definí las variables de entorno `DB_USER`, `DB_PASSWORD`, `JWT_SECRET` (mínimo 32 caracteres) y `GEMINI_API_KEY`.
 2. Ejecutá:
 
 ```bash
@@ -148,6 +172,7 @@ Respuesta (`201 Created`):
 | DELETE | `/postulaciones/{id}` | Eliminar una postulación | Sí |
 | GET | `/perfil` | Obtener mi perfil de habilidades | Sí |
 | PUT | `/perfil` | Guardar mi perfil (reemplaza el anterior) | Sí |
+
 Parámetros opcionales del listado: `estado`, `buscar`, `page`, `size` y `sort`.
 Ejemplo: `GET /postulaciones?estado=ENTREVISTA&buscar=backend&page=0&size=10`
 
@@ -176,6 +201,8 @@ El perfil y el texto de las ofertas se enviarán a un proveedor externo de IA pa
 - **Esquema versionado con Flyway**: cada cambio de la base es un archivo SQL numerado y revisable en un Pull Request; Hibernate solo valida que las entidades coincidan con el esquema.
 - **`PATCH` para modificar postulaciones**: solo se actualizan los campos que se envían, y un texto opcional se borra enviándolo vacío. El estado tiene su propio endpoint (`PATCH /postulaciones/{id}/estado`).
 - **Perfil como texto libre** guardado en la tabla `usuario` (hasta 3000 caracteres): es lo más simple que sirve para el análisis, y el usuario se identifica por el token en `/perfil`.
+- **El proveedor de IA queda detrás de una interfaz (`LlmClient`)**: cambiar de proveedor es escribir una clase nueva, y los tests usan un cliente falso sin gastar cuota.
+- **Errores de IA traducidos**: cuota agotada o servicio caído devuelven `503`; una respuesta inválida del modelo, `502`.
 
 ## Próximos pasos
 
