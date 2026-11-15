@@ -31,14 +31,26 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CredencialesInvalidasException.class)
-    public ResponseEntity<ErrorResponse> handleCredencialesInvalidas(CredencialesInvalidasException ex){
+    public ResponseEntity<ErrorResponse> handleCredencialesInvalidas(CredencialesInvalidasException ex) {
         ErrorResponse body = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
-    public ResponseEntity<ErrorResponse> handleRecursoNoEncontrado(RecursoNoEncontradoException ex){
+    public ResponseEntity<ErrorResponse> handleRecursoNoEncontrado(RecursoNoEncontradoException ex) {
         ErrorResponse body = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(LlmNoDisponibleException.class)
+    public ResponseEntity<ErrorResponse> handleLlmNoDisponible(LlmNoDisponibleException ex) {
+        ErrorResponse body = new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    }
+
+    @ExceptionHandler(LlmRespuestaInvalidaException.class)
+    public ResponseEntity<ErrorResponse> handleLlmRespuestaInvalida(LlmRespuestaInvalidaException ex) {
+        ErrorResponse body = new ErrorResponse(HttpStatus.BAD_GATEWAY.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
     }
 }
