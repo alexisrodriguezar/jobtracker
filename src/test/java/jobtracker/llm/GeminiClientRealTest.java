@@ -13,7 +13,7 @@ class GeminiClientRealTest {
     void generarJson_conLaApiReal_devuelveUnJson() {
         String modelo = System.getenv("GEMINI_MODEL");
         if (modelo == null || modelo.isBlank()) {
-            modelo = "gemini-3.6-flash";
+            modelo = "gemini-3.5-flash-lite";
         }
 
         GeminiClient cliente = new GeminiClient(
