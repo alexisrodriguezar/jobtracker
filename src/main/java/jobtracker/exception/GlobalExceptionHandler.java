@@ -53,4 +53,16 @@ public class GlobalExceptionHandler {
         ErrorResponse body = new ErrorResponse(HttpStatus.BAD_GATEWAY.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
     }
+
+    @ExceptionHandler(LimiteUsuarioExcedidoException.class)
+    public ResponseEntity<ErrorResponse> handleLimiteUsuario(LimiteUsuarioExcedidoException ex) {
+        ErrorResponse body = new ErrorResponse(HttpStatus.TOO_MANY_REQUESTS.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(body);
+    }
+
+    @ExceptionHandler(CupoGlobalAgotadoException.class)
+    public ResponseEntity<ErrorResponse> handleCupoGlobal(CupoGlobalAgotadoException ex) {
+        ErrorResponse body = new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    }
 }
