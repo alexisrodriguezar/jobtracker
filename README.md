@@ -72,6 +72,8 @@ La aplicación se configura con estas variables:
 | `JWT_SECRET` | Clave para firmar los tokens (mínimo 32 caracteres) | Sí |
 | `GEMINI_API_KEY` | Clave de la API de Gemini, para el análisis con IA | Sí |
 | `GEMINI_MODEL` | Modelo de Gemini a utilizar | No (tiene un valor por defecto) |
+| `ANALISIS_LIMITE_DIARIO_POR_USUARIO` | Análisis de IA por usuario y por día | No (por defecto, 5) |
+| `ANALISIS_LIMITE_DIARIO_GLOBAL` | Análisis de IA por día entre todos los usuarios | No (por defecto, 300) |
 
 Con Docker se completan en el archivo `.env` (hay una plantilla en `.env.example`). Nunca subas tu `.env` al repositorio.
 
@@ -203,6 +205,7 @@ El perfil y el texto de las ofertas se enviarán a un proveedor externo de IA pa
 - **Perfil como texto libre** guardado en la tabla `usuario` (hasta 3000 caracteres): es lo más simple que sirve para el análisis, y el usuario se identifica por el token en `/perfil`.
 - **El proveedor de IA queda detrás de una interfaz (`LlmClient`)**: cambiar de proveedor es escribir una clase nueva, y los tests usan un cliente falso sin gastar cuota.
 - **Errores de IA traducidos**: cuota agotada o servicio caído devuelven `503`; una respuesta inválida del modelo, `502`.
+- **Control de uso de la IA**: los análisis se limitan por usuario y en total por día, y se cuentan en la base (tabla `uso_ia`) con el día medido en hora del Pacífico, para respetar la cuota gratuita del proveedor. Un análisis que falla no consume cupo.
 
 ## Próximos pasos
 
