@@ -20,6 +20,7 @@ Es un proyecto personal para practicar un backend completo con Java y Spring Boo
 - Documentación interactiva con **Swagger / OpenAPI**.
 - Cada postulación puede guardar el texto de la oferta laboral (descripción), que se usará para el análisis con IA.
 - Perfil de habilidades del usuario (texto libre de hasta 3000 caracteres), que se usará para comparar con las ofertas.
+- Análisis con IA de cada oferta contra tu perfil: porcentaje de coincidencia, habilidades que pide, las que tenés y las que faltan, y sugerencias.
 
 ## Tecnologías
 
@@ -174,6 +175,8 @@ Respuesta (`201 Created`):
 | DELETE | `/postulaciones/{id}` | Eliminar una postulación | Sí |
 | GET | `/perfil` | Obtener mi perfil de habilidades | Sí |
 | PUT | `/perfil` | Guardar mi perfil (reemplaza el anterior) | Sí |
+| POST | `/postulaciones/{id}/analisis` | Analizar la oferta con IA contra mi perfil | Sí |
+| GET | `/postulaciones/{id}/analisis` | Obtener el último análisis guardado | Sí |
 
 Parámetros opcionales del listado: `estado`, `buscar`, `page`, `size` y `sort`.
 Ejemplo: `GET /postulaciones?estado=ENTREVISTA&buscar=backend&page=0&size=10`
@@ -206,11 +209,13 @@ El perfil y el texto de las ofertas se enviarán a un proveedor externo de IA pa
 - **El proveedor de IA queda detrás de una interfaz (`LlmClient`)**: cambiar de proveedor es escribir una clase nueva, y los tests usan un cliente falso sin gastar cuota.
 - **Errores de IA traducidos**: cuota agotada o servicio caído devuelven `503`; una respuesta inválida del modelo, `502`.
 - **Control de uso de la IA**: los análisis se limitan por usuario y en total por día, y se cuentan en la base (tabla `uso_ia`) con el día medido en hora del Pacífico, para respetar la cuota gratuita del proveedor. Un análisis que falla no consume cupo.
+- **La respuesta de la IA nunca se usa sin validar**: se acotan sus valores, su cantidad y su tamaño antes de guardarla.
+- **El texto del usuario se trata como dato, no como instrucciones**: va delimitado y separado de las instrucciones del modelo, para resistir intentos de inyección de prompts.
 
 ## Próximos pasos
 
 - [x] Migraciones de base de datos con Flyway.
-- [ ] Análisis de ofertas con IA: comparar una oferta con el perfil del usuario.
+- [x] Análisis de ofertas con IA: comparar una oferta con el perfil del usuario.
 - [ ] Deploy con URL pública.
 - [ ] Frontend con React.
 
