@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -48,4 +49,12 @@ public class Postulacion {
 
     @Column(name = "descripcion_oferta", length = 8000)
     private String descripcionOferta;
+
+    public static final int MAX_LARGO_ANALISIS = 4000;
+
+    @Column(name = "analisis_json", length = MAX_LARGO_ANALISIS)
+    private String analisisJson;
+
+    @Column(name = "analisis_fecha")
+    private LocalDateTime analisisFecha;
 }
