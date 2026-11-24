@@ -37,10 +37,10 @@ class UsoIaRepositoryTest {
     void registrarUso_primeraVez_creaUnaFilaConCantidadUno() {
         usoIaRepository.registrarUso(ana.getId(), HOY);
 
-        List<UsoIa> filas = usoIaRepository.findAll();
-        assertEquals(1, filas.size());
-        assertEquals(1, filas.get(0).getCantidad());
-        assertEquals(HOY, filas.get(0).getFecha());
+        List<UsoIa> filasDeAna = filasDe(ana);
+        assertEquals(1, filasDeAna.size());
+        assertEquals(1, filasDeAna.get(0).getCantidad());
+        assertEquals(HOY, filasDeAna.get(0).getFecha());
     }
 
     @Test
@@ -50,7 +50,7 @@ class UsoIaRepositoryTest {
         usoIaRepository.registrarUso(ana.getId(), HOY);
 
         assertEquals(3, usoIaRepository.totalDelUsuarioEnElDia(ana.getId(), HOY));
-        assertEquals(1, usoIaRepository.count());
+        assertEquals(1, filasDe(ana).size());
     }
 
     @Test
@@ -89,5 +89,11 @@ class UsoIaRepositoryTest {
         usuario.setEmail(email);
         usuario.setPasswordHash("hash-falso");
         return usuario;
+    }
+
+    private List<UsoIa> filasDe(Usuario usuario) {
+        return usoIaRepository.findAll().stream()
+                .filter(uso -> uso.getUsuario().getId().equals(usuario.getId()))
+                .toList();
     }
 }
