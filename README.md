@@ -189,6 +189,7 @@ Ejemplo: `GET /postulaciones?estado=ENTREVISTA&buscar=backend&page=0&size=10`
 
 - **Unitarios** (JUnit 5 y Mockito): cubren la lógica de los services, incluyendo los casos de seguridad (un usuario intentando acceder a datos de otro).
 - **De integración** (Testcontainers): prueban los repositories contra un MySQL real que se levanta en un contenedor, verificando consultas, filtros, paginación y restricciones de la base.
+- **De API completa** (MockMvc + Testcontainers): arrancan toda la aplicación contra un MySQL real y recorren los flujos de un usuario por HTTP: registro, login, perfil, postulaciones, análisis con IA, límites de uso y aislamiento entre usuarios. Solo el cliente de IA es falso.
 
 Los tests de integración necesitan Docker en ejecución. Todo el conjunto corre automáticamente en cada Pull Request mediante GitHub Actions.
 
